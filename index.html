@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Проверка на дружбу</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: linear-gradient(145deg, #f5f0ff 0%, #e8deff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 30px 28px 40px;
+            box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.25),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2b1b4a;
+            text-align: center;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        h1 span {
+            background: #ffd966;
+            padding: 0 14px;
+            border-radius: 60px;
+            font-size: 1.8rem;
+            line-height: 1.4;
+        }
+        .subhead {
+            text-align: center;
+            color: #4a3a6b;
+            font-weight: 500;
+            font-size: 1rem;
+            border-bottom: 2px dashed #cdb8ff;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+        .question-box {
+            background: white;
+            border-radius: 32px;
+            padding: 28px 20px 20px;
+            box-shadow: 0 8px 20px rgba(98, 70, 160, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+        .question-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1f113a;
+            text-align: center;
+            padding: 8px 0 18px;
+            word-break: break-word;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 18px 0 12px;
+        }
+        .option-btn {
+            background: #f3edff;
+            border: 2px solid #d8caff;
+            border-radius: 60px;
+            padding: 16px 8px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2a1a4a;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 0 #b8a3e6;
+            text-align: center;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+            background: #ede4ff;
+            border-color: #b397f0;
+            box-shadow: 0 6px 0 #a48ad6;
+        }
+        .option-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #a48ad6;
+        }
+        .option-btn.correct {
+            background: #b6e6b6;
+            border-color: #2d7a2d;
+            box-shadow: 0 4px 0 #1f5a1f;
+            color: #0b3b0b;
+        }
+        .option-btn.wrong {
+            background: #fccccc;
+            border-color: #b33f3f;
+            box-shadow: 0 4px 0 #7a2a2a;
+            color: #5a1a1a;
+        }
+        .feedback {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+            min-height: 3.2rem;
+            padding: 12px 8px 6px;
+            color: #2b1b4a;
+            border-radius: 30px;
+            background: rgba(255, 240, 200, 0.3);
+            margin: 10px 0 8px;
+        }
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 22px;
+            font-weight: 500;
+            color: #3d2b62;
+        }
+        .progress-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: #d4c6f0;
+            border-radius: 20px;
+            margin: 0 14px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #8f72d6, #623bb5);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+        .counter {
+            font-weight: 600;
+            background: rgba(255,255,255,0.4);
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+        }
+        .result-area {
+            margin-top: 24px;
+            padding: 20px 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 40px;
+            text-align: center;
+        }
+        .result-area h2 {
+            font-size: 1.8rem;
+            color: #1f113a;
+        }
+	/* Адаптивный контейнер для видео с сохранением пропорций */
+	.video-wrapper {
+            margin: 18px 0 16px;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 8px 26px rgba(0,0,0,0.13);
+            background: #0f0a1a;
+            position: relative;
+            width: 100%;
+            /* Автоматическая высота, которая подстраивается под видео */
+            height: auto;
+	}
+
+	/* Видео заполняет контейнер, сохраняя пропорции */
+	.video-wrapper video {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #000;
+            /* Сохраняет оригинальное соотношение сторон */
+            aspect-ratio: auto;
+        }
+        .link-out {
+            display: inline-block;
+            margin: 18px 0 6px;
+            padding: 16px 40px;
+            background: #2b1b4a;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-decoration: none;
+            border-radius: 60px;
+            box-shadow: 0 8px 0 #140d24;
+            transition: 0.08s linear;
+            border: 1px solid #aa93e0;
+        }
+        .link-out:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #140d24;
+        }
+        .link-out i {
+            margin-right: 8px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .reset-btn {
+            background: #d7c9ff;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1e1138;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: 0.1s;
+            box-shadow: 0 4px 0 #a58acf;
+        }
+        .reset-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #a58acf;
+        }
+        .footer-note {
+            margin-top: 20px;
+            color: #4a3a6b;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        @media (max-width: 480px) {
+            .container { padding: 20px 16px; }
+            .question-text { font-size: 1.5rem; }
+            .options-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .option-btn { font-size: 1.2rem; padding: 14px 6px; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <h1>
+            🛑 <span>СТОП</span>
+        </h1>
+        <div class="subhead">✨ Перед тем как пройти дальше, ответь на 5 вопросов!</div>
+
+        <!-- Блок вопросов -->
+        <div id="quizBlock">
+            <div class="question-box">
+                <div class="question-text" id="questionText">Загрузка...</div>
+                <div class="options-grid" id="optionsContainer"></div>
+                <div class="feedback" id="feedbackMessage">👋 Нажми на вариант ответа</div>
+                <div class="progress">
+                    <span class="counter" id="progressCounter">1 / 5</span>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Блок результата (появляется после теста) -->
+        <div id="resultBlock" class="result-area hidden">
+            <h2 id="resultTitle">🎉 Ты — настоящий друг!</h2>
+            <div id="resultDesc" style="margin: 12px 0; font-size: 1.1rem; color: #2b1b4a;">
+                Твой результат: 5 / 5
+            </div>
+            <!-- ВСТРОЕННОЕ ВИДЕО (YouTube) -->
+            <!-- ВИДЕО: ВАРИАНТ 1 - ЛОКАЛЬНОЕ ВИДЕО (загрузите файл video.mp4 в репозиторий) -->
+            <div class="video-wrapper">
+                <video id="friendshipVideo" controls playsinline preload="metadata">
+                    <source src="video12345.mp4" type="video/mp4">
+                    <!-- Если видео не загрузится, показываем YouTube как запасной вариант -->
+                    Ваш браузер не поддерживает видео. 
+                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">Смотреть на YouTube</a>
+                </video>
+            </div>
+            
+            <!-- Управление видео -->
+            <div class="video-controls">
+                <button onclick="document.getElementById('friendshipVideo').play()">▶ Воспроизвести</button>
+                <button onclick="document.getElementById('friendshipVideo').pause()">⏸ Пауза</button>
+                <button onclick="document.getElementById('friendshipVideo').currentTime = 0">⏪ С начала</button>
+            </div>
+            <!-- ССЫЛКА НА ДРУГОЙ САЙТ (или на видео, если хотите) -->
+            <a href="https://example.com" target="_blank" class="link-out">
+                Переход на продолжение (только после просмотра видео!)
+            </a>
+            <button class="reset-btn" id="resetTestBtn">🔄 Пройти заново</button>
+        </div>
+
+        <div class="footer-note">Внимание! Проходит проверка на дружбу</div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- ВОПРОСЫ (математические примеры) ----------
+            const questions = [
+                { 
+                    question: 'Как зовут мою кошку?', 
+                    options: ['Барсик', 'Мурзик', 'Дарсик', 'Тефтелька'], 
+                    correct: 2 
+                },
+                { 
+                    question: 'Чему равен корень из 13456?', 
+                    options: ['115', '116', '113', '112'], 
+                    correct: 1
+                },
+                { 
+                    question: 'В честь какого праздника весь этот сыр-бор?', 
+                    options: ['Новый год', '8 марта', '23 февраля', 'День рождения'], 
+                    correct: 3 
+                },
+                { 
+                    question: 'Чему равен определенный ∫x^2, где a=5, b=3?', 
+                    options: ['2', '3', '4', 'Какого черта тут интеграл?'], 
+                    correct: 2 
+                },
+                { 
+                    question: 'Сколько лет мы уже дружим?', 
+                    options: ['3.5', '67', '228', 'Всю жизнь😇'], 
+                    correct: 0 
+                }
+            ];
+
+            // DOM-элементы
+            const quizBlock = document.getElementById('quizBlock');
+            const resultBlock = document.getElementById('resultBlock');
+            const questionText = document.getElementById('questionText');
+            const optionsContainer = document.getElementById('optionsContainer');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            const progressCounter = document.getElementById('progressCounter');
+            const progressFill = document.getElementById('progressFill');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultDesc = document.getElementById('resultDesc');
+            const resetBtn = document.getElementById('resetTestBtn');
+
+            // Состояние
+            let currentIndex = 0;
+            let userAnswers = [];       // массив из 5 булевых (правильно/неправильно)
+            let isAnswered = false;      // флаг, что на текущий вопрос уже отвечено
+            let totalQuestions = questions.length;
+
+            // ---------- Отрисовка вопроса ----------
+            function renderQuestion(index) {
+                const q = questions[index];
+                if (!q) return;
+
+                questionText.textContent = q.question;
+                optionsContainer.innerHTML = '';
+
+                // Создаём кнопки вариантов
+                q.options.forEach((text, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = text;
+                    btn.dataset.optIndex = idx;
+
+                    // Если уже отвечали на этот вопрос — показываем состояние
+                    if (isAnswered) {
+                        const isCorrect = (idx === q.correct);
+                        const userChose = (userAnswers[index] !== undefined && userAnswers[index].selected === idx);
+                        if (isCorrect) {
+                            btn.classList.add('correct');
+                        } else if (userChose && !isCorrect) {
+                            btn.classList.add('wrong');
+                        }
+                        btn.disabled = true;
+                    } else {
+                        btn.addEventListener('click', onOptionClick);
+                    }
+
+                    optionsContainer.appendChild(btn);
+                });
+
+                // Обновляем прогресс
+                progressCounter.textContent = `${index + 1} / ${totalQuestions}`;
+                const percent = ((index + 1) / totalQuestions) * 100;
+                progressFill.style.width = `${percent}%`;
+
+                // Если вопрос уже отвечен — показываем фидбек
+                if (isAnswered && userAnswers[index]) {
+                    const ans = userAnswers[index];
+                    feedbackMessage.innerHTML = ans.correct 
+                        ? '✅ Верно! Молодец!' 
+                        : `❌ Неверно. Правильный ответ: ${q.options[q.correct]}`;
+                } else {
+                    feedbackMessage.innerHTML = '🤔 Выбери вариант ответа';
+                }
+            }
+
+            // ---------- Обработчик клика по варианту ----------
+            function onOptionClick(e) {
+                if (isAnswered) return; // защита
+
+                const btn = e.currentTarget;
+                const selectedIdx = parseInt(btn.dataset.optIndex, 10);
+                const q = questions[currentIndex];
+                const isCorrect = (selectedIdx === q.correct);
+
+                // Сохраняем ответ
+                userAnswers[currentIndex] = {
+                    selected: selectedIdx,
+                    correct: isCorrect
+                };
+                isAnswered = true;
+
+                // Визуально подсветить кнопки
+                const allBtns = optionsContainer.querySelectorAll('.option-btn');
+                allBtns.forEach((b, idx) => {
+                    b.disabled = true;
+                    if (idx === q.correct) {
+                        b.classList.add('correct');
+                    } else if (idx === selectedIdx && !isCorrect) {
+                        b.classList.add('wrong');
+                    }
+                });
+
+                // Фидбек
+                feedbackMessage.innerHTML = isCorrect 
+                    ? '✅ Верно! Отлично!' 
+                    : `❌ Неверно. Правильный ответ: ${q.options[q.correct]}`;
+
+                // Если это был последний вопрос — через 0.6 сек показываем результат
+                if (currentIndex === totalQuestions - 1) {
+                    setTimeout(() => {
+                        showResult();
+                    }, 600);
+                } else {
+                    // Иначе через паузу переключаем на следующий
+                    setTimeout(() => {
+                        // Переход к следующему вопросу
+                        currentIndex++;
+                        isAnswered = false;
+                        renderQuestion(currentIndex);
+                    }, 700);
+                }
+            }
+
+            // ---------- Показать результат ----------
+            function showResult() {
+                // Считаем количество правильных ответов
+                const correctCount = userAnswers.filter(a => a && a.correct === true).length;
+                const total = totalQuestions;
+
+                // Заголовок и описание
+                let title = '';
+                let desc = `Твой результат: ${correctCount} / ${total}`;
+                if (correctCount === total) {
+                    title = 'АЙ СИГМА ЛЕГЕНДА ТРАКТОР ГОРЖУСЬ';
+                } else if (correctCount >= total - 1) {
+                    title = 'Опана. Почти идеально';
+                } else if (correctCount >= 3) {
+                    title = 'Неплохо, но есть куда расти';
+                } else {
+                    title = 'Сомнительно, но ладно, прощаю';
+                }
+
+                resultTitle.textContent = title;
+                resultDesc.textContent = desc;
+
+                // Скрываем викторину, показываем результат
+                quizBlock.classList.add('hidden');
+                resultBlock.classList.remove('hidden');
+            }
+
+            // ---------- Сброс теста (заново) ----------
+            function resetTest() {
+                currentIndex = 0;
+                userAnswers = [];
+                isAnswered = false;
+
+                // Скрываем результат, показываем викторину
+                resultBlock.classList.add('hidden');
+                quizBlock.classList.remove('hidden');
+
+                // Перерисовываем первый вопрос
+                renderQuestion(currentIndex);
+            }
+
+            // ---------- Инициализация ----------
+            function init() {
+                // Сбросить всё
+                userAnswers = [];
+                currentIndex = 0;
+                isAnswered = false;
+                renderQuestion(currentIndex);
+            }
+
+            // Событие на кнопку "Пройти заново"
+            resetBtn.addEventListener('click', resetTest);
+
+            // Запуск
+            init();
+        })();
+    </script>
+</body>
+</html>
